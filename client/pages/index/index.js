@@ -9,7 +9,7 @@ Page({
 
     getCoffeeOptions(callback) {
         wx.cloud.callFunction({
-            name: 'listcoffeeoptions'
+            name: 'list-coffee-options'
         }).then(({result}) => {
             const {code, errMsg, data} = result;
             if(code) {
@@ -31,7 +31,9 @@ Page({
             hasUserInfo: true
         });
 
-        this.getCoffeeOptions(result => console.log);
+        this.getCoffeeOptions(result => {
+            console.log(result);
+        });
     },
 
     onAuthed(authInfo) {
