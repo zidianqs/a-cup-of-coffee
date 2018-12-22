@@ -1,0 +1,93 @@
+[{
+    "BaseType": "标准美式",
+    "PriceType": "B1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["无糖", "单糖", "半糖"],
+        "ExtendDefaultOption": "无糖"
+    }, {
+        "ExtendType": "奶",
+        "ExtendOptions": ["无奶", "单奶", "双奶"],
+        "ExtendDefaultOption": "无奶"
+    }]
+}, {
+    "BaseType": "加浓美式",
+    "PriceType": "C1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["无糖", "单糖", "半糖"],
+        "ExtendDefaultOption": "无糖"
+    }, {
+        "ExtendType": "奶",
+        "ExtendOptions": ["无奶", "单奶", "双奶"],
+        "ExtendDefaultOption": "无奶"
+    }]
+}, {
+    "BaseType": "榛果拿铁",
+    "PriceType": "D1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["单糖", "半糖"],
+        "ExtendDefaultOption": "半糖"
+    }]
+}, {
+    "BaseType": "香草拿铁",
+    "PriceType": "D1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["单糖", "半糖"],
+        "ExtendDefaultOption": "半糖"
+    }]
+}, {
+    "BaseType": "焦糖拿铁",
+    "PriceType": "D1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["单糖", "半糖"],
+        "ExtendDefaultOption": "半糖"
+    }]
+}, {
+    "BaseType": "拿铁",
+    "PriceType": "C1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "糖度",
+        "ExtendOptions": ["无糖", "单糖", "半糖"],
+        "ExtendDefaultOption": "无糖"
+    }]
+}, {
+    "BaseType": "圣诞姜饼人拿铁",
+    "PriceType": "D1",
+    "ExtendOptions": [{
+        "ExtendType": "温度",
+        "ExtendOptions": ["冰", "热"],
+        "ExtendDefaultOption": "热"
+    }, {
+        "ExtendType": "奶油",
+        "ExtendOptions": ["默认奶油", "无奶油"],
+        "ExtendDefaultOption": "默认奶油"
+    }]
+}]
