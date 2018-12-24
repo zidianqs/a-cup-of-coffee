@@ -9,10 +9,11 @@
 	},
 	"setting": {
 		"urlCheck": false,
-		"es6": false,
+		"es6": true,
 		"postcss": true,
 		"minified": true,
-		"newFeature": true
+		"newFeature": true,
+		"autoAudits": false
 	},
 	"compileType": "miniprogram",
 	"libVersion": "2.2.5",
@@ -39,13 +40,19 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 1,
 			"list": [
 				{
 					"id": 0,
 					"name": "选择",
 					"pathName": "pages/choose/index",
 					"query": "eventType=hello"
+				},
+				{
+					"id": 1,
+					"name": "详情",
+					"pathName": "pages/booking/index",
+					"query": "id=XCDorZT75u22va89"
 				}
 			]
 		}

@@ -6,12 +6,14 @@ const today = () => {
 }
 
 exports.main = async (event={}, context) => {
+    console.log(event);
     const {
         action, // 操作
         userInfo, // 个人用户信息
         bookingId, // 要加入的拼团ID
         bookingInfo, // 新建/更新拼团的详细信息
         choiceInfo, // 选择的咖啡种类
+        profile
     } = event;
 
     cloud.init({
@@ -38,6 +40,14 @@ exports.main = async (event={}, context) => {
                 }).get();
 
                 break;
+            case 'my':
+                results = await collection.where({
+                    status: 'created',
+                    owner: OPENID
+                }).get()
+                break;
+            case 'detail':
+                return await collection.doc(bookingInfo.id).get();
             case 'create':
                 results = await collection.add({
                     data: {
@@ -47,7 +57,8 @@ exports.main = async (event={}, context) => {
                         owner: OPENID,
                         participants: [{
                             user: OPENID,
-                            choice: choiceInfo
+                            choice: choiceInfo,
+                            profile
                         }]
                     }
                 });
@@ -73,9 +84,19 @@ exports.main = async (event={}, context) => {
                 ret = await collection.doc(bookingInfo.id).get();
                 binfo = ret.data;
 
+                hit = binfo.participants.find(p => p.user === OPENID);
+
+                if(hit) {
+                    return {
+                        code: 4,
+                        errMsg: '你已经点过啦'
+                    }
+                }
+
                 binfo.participants.push({
                     user: OPENID,
-                    choice: choiceInfo
+                    choice: choiceInfo,
+                    profile
                 });
 
                 results = await collection.doc(bookingInfo.id).update({

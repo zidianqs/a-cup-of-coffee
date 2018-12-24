@@ -1,0 +1,21 @@
+<!--index.wxml-->
+<view class="container">
+    <block wx:if="{{hasUserInfo}}">
+        <open-data class="avatar" type="userAvatarUrl"></open-data>
+        <open-data type="userNickName"></open-data>
+        <open-data type="groupName"></open-data>
+
+        <view class="actions">
+            <button class="action" bindtap="onStartBooking">发起拼单</button>
+            <button class="action" bindtap="onEndBooking">结束拼单</button>
+            <button class="action" bindtap="onJoinBooking">加入拼单</button>
+            <button class="action" bindtap="onLeaveBooking">退出拼单</button>
+            <button class="action" bindtap="onSavePerference">保存偏好</button>
+            <button class="action" bindtap="onGetBooking">获取拼单</button>
+            <button class="action" bindtap="onGetCoffeeList">获取咖啡列表</button>
+        </view>
+    </block>
+    <block wx:else>
+        <button class="comeon" open-type="getUserInfo" type="default" bindgetuserinfo="onAuthed">来一杯</button>
+    </block>
+</view>

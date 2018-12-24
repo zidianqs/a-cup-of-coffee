@@ -1,199 +1,39 @@
-//获取应用实例
-const app = getApp()
+const EventEmitter = require('../../utils/EventEmitter');
+const {syncProfile, checkUserInfo} = require('../../utils/common');
+
+const PREFERENCE_EVT = 'onPreferenceUpdated';
 
 Page({
     data: {
+        deadline: '14:00',
         hasUserInfo: false,
-        userInfo: null
+        profile: null,
+        booking: null
     },
 
-    getCoffeeOptions(callback) {
-        wx.cloud.callFunction({
-            name: 'list-coffee-options'
-        }).then(({result}) => {
-            const {code, errMsg, data} = result;
-            if(code) {
-                wx.showToast({
-                    title: errMsg,
-                    icon: 'none'
-                });
-                return;
-            }
-
-            callback(data);
+    updatePreference(preference) {
+        wx.showToast({
+            title: '正在更新您的口味...',
+            icon: 'loading'
+        });
+        return syncProfile(null, preference).then(profile => {
+            this.setData({
+                profile
+            });
         });
     },
 
-    // 发起一次拼单
-    startBooking(choice) {
-        wx.cloud.callFunction({
-            name: 'update-booking',
-            data: {
-                action: 'create',
-                userInfo: this.data.userInfo,
-                bookingInfo: {
-                    deadline: '14:00'
-                },
-                choiceInfo: choice
-            }
-        }).then(result => {
-            console.log(result);
-        })
-    },
+    onDeadlineChange(evt) {
+        const {detail} = evt;
 
-    getActiveBooking(callback) {
-        wx.cloud.callFunction({
-            name: 'update-booking',
-            data: {
-                action: 'list'
-            }
-        }).then(({result}) => {
-            const {code, errMsg, data} = result;
-            if(code) {
-                wx.showToast({
-                    title: errMsg,
-                    icon: 'none'
-                });
-                return;
-            }
-
-            callback(data);
-        });
-    },
-
-    joinActiveBooking(_id, choiceInfo, callback) {
-        wx.cloud.callFunction({
-            name: 'update-booking',
-            data: {
-                action: 'join',
-                bookingInfo: {
-                    id: _id
-                },
-                choiceInfo
-            }
-        }).then(({result}) => {
-            const {code, errMsg, data} = result;
-            if(code) {
-                wx.showToast({
-                    title: errMsg,
-                    icon: 'none'
-                });
-                return;
-            }
-
-            callback(data);
-        });
-    },
-
-    leaveActiveBooking(_id, callback) {
-        wx.cloud.callFunction({
-            name: 'update-booking',
-            data: {
-                action: 'leave',
-                bookingInfo: {
-                    id: _id
-                }
-            }
-        }).then(({result}) => {
-            const {code, errMsg, data} = result;
-            if(code) {
-                wx.showToast({
-                    title: errMsg,
-                    icon: 'none'
-                });
-                return;
-            }
-
-            callback(data);
-        });
-    },
-
-    // 更新页面展示用户信息
-    updateUserInfo(userInfo) {
         this.setData({
-            userInfo,
-            hasUserInfo: true
-        });
-    },
-
-    onStartBooking() {
-        this.getCoffeeOptions(results => {
-            const first = results[0];
-
-            this.startBooking({
-                BaseType: first.BaseType,
-                ExtendChoice: first.ExtendOptions.map(option => option.ExtendDefaultOption).join(','),
-                PriceType: first.PriceType
-            });
-        });
-    },
-    onEndBooking() {
-        this.getActiveBooking((bk) => {
-            wx.cloud.callFunction({
-                name: 'update-booking',
-                data: {
-                    action: 'end',
-                    bookingInfo: {
-                        id: bk[0]._id
-                    }
-                }
-            }).then(({result}) => {
-                const {code, errMsg, data} = result;
-                if(code) {
-                    wx.showToast({
-                        title: errMsg,
-                        icon: 'none'
-                    });
-                    return;
-                }
-
-                console.log(data);
-            });
-        });
-    },
-    onJoinBooking() {
-        this.getCoffeeOptions(list => {
-            const first = list[0];
-
-            this.getActiveBooking(active => {
-                if(!active.length) {
-                    wx.showToast({
-                        title: '当前没有正在发起的拼单'
-                    });
-                    return;
-                }
-                this.joinActiveBooking(active[0]._id, {
-                    BaseType: first.BaseType,
-                    ExtendChoice: first.ExtendOptions.map(option => option.ExtendDefaultOption).join(','),
-                    PriceType: first.PriceType
-                }, (result) => {
-                    console.log(result);
-                });
-            });
-        })
-    },
-    onLeaveBooking() {
-        this.getActiveBooking(active => {
-            this.leaveActiveBooking(active[0]._id, result => {
-                console.log(result);
-            });
-        })
-    },
-    onSavePerference() {
-    },
-    onGetBooking() {
-        this.getActiveBooking((bk) => {
-            console.log(bk);
-        });
-    },
-    onGetCoffeeList() {
-        this.getCoffeeOptions(list => {
-            console.log(list)
+            deadline: detail.vaue
         });
     },
 
     onAuthed(authInfo) {
         const {detail} = authInfo;
+
         if(detail.errMsg) {
             wx.showToast({
                 title: '小样不给授权就不能用！',
@@ -201,27 +41,101 @@ Page({
             });
             return;
         }
-        this.updateUserInfo(detail);
+
+        this.updateProfile(detail).then(this.getMyBooking).catch(this.onError);
     },
 
-    onShow() {
-        wx.getSetting({
-            success: (res={}) => {
-                const {authSetting} = res;
-                if(authSetting['scope.userInfo']) {
-                    wx.getUserInfo({
-                        success: uinfo => {
-                            console.log(uinfo);
-                            const {userInfo} = uinfo;
+    onCreateBooking() {
+        const {profile={}, id} = this.data;
+        console.log(profile);
+        if(!profile.preference) {
+            this.onChangePreference();
+            return;
+        }
 
-                            this.updateUserInfo(userInfo);
-                        }
-                    })
-                }
-            },
-            fail: err => {
-                console.log(err);
+        return wx.cloud.callFunction({
+            name: 'update-booking',
+            data: {
+                action: 'create',
+                bookingInfo: {
+                    deadline: this.data.deadline
+                },
+                choiceInfo: profile.preference,
+                profile: profile.user
+            }
+        }).then(({result}) => {
+            const {code, errMsg, _id} = result;
+            if(code) {
+                wx.showToast({
+                    title: errMsg,
+                    icon: 'none'
+                });
+                return;
+            }
+
+            wx.showToast({
+                title: '发起成功',
+                icon: 'success'
+            });
+
+            wx.navigateTo({
+                url: `/pages/booking/index?id=${_id}`
+            });
+        });
+    },
+
+    onChangePreference() {
+        wx.navigateTo({
+            url: `/pages/choose/index?eventType=${PREFERENCE_EVT}`
+        });
+    },
+
+    updateProfile(userInfo) {
+        return syncProfile(userInfo).then(profile => {
+            this.setData({
+                hasUserInfo: true,
+                profile
+            });
+        });
+    },
+
+    getMyBooking() {
+        // 获取我发起的
+        return wx.cloud.callFunction({
+            name: 'update-booking',
+            data: {
+                action: 'my'
+            }
+        }).then(({result}) => {
+            const {code, errMsg, data} = result;
+            if(code) {
+                wx.showToast({
+                    title: errMsg,
+                    icon: 'none'
+                });
+                return;
+            }
+
+            if(data.length) {
+                console.log(data[0]);
+                this.setData({
+                    booking: data[0]
+                });
             }
         });
+    },
+
+    onReady() {
+        checkUserInfo().then(this.updateProfile).then(this.getMyBooking).catch(this.onError);
+
+        // 监听选择口味回调
+        EventEmitter.addListener(PREFERENCE_EVT, this.updatePreference);
+    },
+
+    onError(e) {
+        wx.showToast({
+            title: e.message
+        });
+        console.log(e);
     }
 })

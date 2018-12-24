@@ -4,7 +4,7 @@ const DEFAULT_EVENT_TYPE = 'COFFEE_CONFIRMED';
 
 Page({
     data: {
-        params: null,
+        param: null,
         // 一级选项
         coffeeOptions: [],
         coffeeIndex: 0,
@@ -65,12 +65,12 @@ Page({
 
         console.log(`${baseType} ${extendType}`);
         EventEmitter.dispatch(event, `${baseType} ${extendType}`);
-        wx.navigatorBack();
+        wx.navigateBack();
     },
 
-    onLoad(params) {
+    onLoad(param) {
         this.setData({
-            params
+            param
         });
     },
 
