@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/choose/index",
     "pages/my/index"
   ],
   "window": {

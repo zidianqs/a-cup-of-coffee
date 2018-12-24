@@ -17,46 +17,96 @@ exports.main = async (event={}, context) => {
     cloud.init({
         env: 'prod-1-5d009e'
     });
+
+    const {OPENID} = cloud.getWXContext();
     // 数据库引用
     const db = cloud.database();
 
     // 集合引用
     const collection = db.collection('BookingInfo');
 
+    let binfo = null;
+    let ret = null;
+    let results = null;
+    let hit = null;
+
     try {
         switch(action) {
+            case 'list':
+                results = await collection.where({
+                    status: 'created'
+                }).get();
+
+                break;
             case 'create':
                 results = await collection.add({
-                    status: 'created',
-                    date: today(), // current date
-                    deadline: bookingInfo.deadline,
-                    participants: [{
-                        user: userInfo.openId,
-                        choice: choiceInfo,
-                        isOwner: true
-                    }]
+                    data: {
+                        status: 'created',
+                        date: today(), // current date
+                        deadline: bookingInfo.deadline,
+                        owner: OPENID,
+                        participants: [{
+                            user: OPENID,
+                            choice: choiceInfo
+                        }]
+                    }
                 });
                 break;
             case 'end':
-                const {data: binfo} = await collection.doc(bookingInfo.id).get();
+                ret = await collection.doc(bookingInfo.id).get();
+                binfo = ret.data;
 
-                if(!binfo.participants.filter(u => u.user === userInfo.openId && u.isOwner).length) {
+                if(binfo.owner !== OPENID) {
                     results = {
                         code: 3,
                         errMsg: '你不能修改别人发起的'
                     }
                     break;
                 }
-
-                results = await collection.doc(bookingInfo.id).update(binfo);
+                results = await collection.doc(bookingInfo.id).update({
+                    data: {
+                        status: 'done'
+                    }
+                });
                 break;
             case 'join':
-            case 'left':
+                ret = await collection.doc(bookingInfo.id).get();
+                binfo = ret.data;
+
+                binfo.participants.push({
+                    user: OPENID,
+                    choice: choiceInfo
+                });
+
+                results = await collection.doc(bookingInfo.id).update({
+                    data: {
+                        participants: binfo.participants
+                    }
+                });
+                break;
+            case 'leave':
+                ret = await collection.doc(bookingInfo.id).get();
+                binfo = ret.data;
+
+                hit = binfo.participants.findIndex(u => {
+                    return u.user === OPENID;
+                });
+
+                if(hit !== -1) {
+                    binfo.participants.splice(hit, 1);
+
+                    results = await collection.doc(bookingInfo.id).update({
+                        data: {
+                            participants: binfo.participants
+                        }
+                    });
+                }
+                break;
             default:
-            results = {
-                code: 2,
-                errMsg: '未指定action'
-            };
+                results = {
+                    code: 2,
+                    errMsg: '未指定action'
+                };
         }
     } catch(e) {
         results = {

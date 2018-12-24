@@ -1,0 +1,31 @@
+<view class="page">
+    <view class="weui-cell weui-cell_select">
+        <view class="weui-cell__hd weui-cell__hd_in-select-after">
+            <view class="weui-label">我要</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker bindchange="bindCoffeeChange" value="{{coffeeIndex}}" range="{{coffeeOptions}}">
+                <view class="weui-select weui-select_in-select-after">{{coffeeOptions[coffeeIndex]}}</view>
+            </picker>
+        </view>
+    </view>
+    <view class="">
+        <block wx:for="{{subOptions}}" wx:for="{{subOptions}}" wx:for-index="optionIdx" wx:for-item="option" wx:key="{{optionIdx}}">
+            <view class="weui-cells__title">{{option.title}}</view>
+            <view class="weui-cells weui-cells_after-title" >
+                <radio-group bindchange="bindCoffeeSubOptionChange" data-group="{{optionIdx}}">
+                    <label class="weui-cell weui-check__label" wx:for="{{option.list}}" wx:for-item="li" wx:for-index="liIdx" wx:key="liIdx">
+                        <radio class="weui-check" value="{{liIdx}}" checked="{{liIdx === option.selected}}"/>
+                        <view class="weui-cell__bd">{{li}}</view>
+                        <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{liIdx === option.selected}}">
+                            <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
+                        </view>
+                    </label>
+                </radio-group>
+            </view>
+        </block>
+    </view>
+    <view class="weui-footer weui-footer_fixed-bottom">
+        <button class="weui-btn" type="primary" disabled="{{loadingStatus.btnDisabled}}" bindtap="bindSelectDone">我选好了</button>
+    </view>
+</view>
