@@ -10,8 +10,8 @@ Page({
         id: null,
         hasUserInfo: false,
         profile: null,
-        c: null,
-        isMine: false
+        isMine: false,
+        loadingStatus: true
     },
 
     getBookingDetail(_id) {
@@ -42,8 +42,6 @@ Page({
             this.onChangePreference();
             return;
         }
-
-        console.log(profile.user);
         return wx.cloud.callFunction({
             name: 'update-booking',
             data: {
@@ -69,7 +67,15 @@ Page({
                 icon: 'success'
             });
 
-            return data;
+            const participants = this.data.booking.participants;
+            participants.push({
+                choice: profile.preference,
+                profile: profile.user
+            });
+
+            this.setData({
+                booking: {...this.data.booking}
+            });
         });
     },
 
@@ -164,9 +170,15 @@ Page({
 
     onShareAppMessage() {
         return {
-            title: `${this.data.profile.user.nickName}请你来一杯`,
+            title: `${this.data.profile.user.nickName}请你拼一杯`,
             path: `/pages/booking/index?id=${this.data.id}`
         }
+    },
+
+    onPullDownRefresh() {
+        this.updateBookingDetail().catch(this.onError).then(() => {
+            wx.stopPullDownRefresh();
+        });
     },
 
     onLoad(params) {
@@ -177,6 +189,8 @@ Page({
             });
             return;
         }
+
+        this.setData({id});
 
         checkUserInfo().then(this.updateProfile).then(this.updateBookingDetail).catch(this.onError);
 

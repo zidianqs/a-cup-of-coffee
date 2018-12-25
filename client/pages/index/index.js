@@ -8,7 +8,8 @@ Page({
         deadline: '14:00',
         hasUserInfo: false,
         profile: null,
-        booking: null
+        booking: null,
+        loadingStatus: true
     },
 
     updatePreference(preference) {
@@ -117,11 +118,20 @@ Page({
             }
 
             if(data.length) {
-                console.log(data[0]);
                 this.setData({
                     booking: data[0]
                 });
+            } else {
+                this.setData({
+                    booking: null
+                });
             }
+        });
+    },
+
+    onPullDownRefresh() {
+        this.getMyBooking().catch(this.onError).then(() => {
+            wx.stopPullDownRefresh();
         });
     },
 
