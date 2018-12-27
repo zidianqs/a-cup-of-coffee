@@ -1,5 +1,5 @@
 const EventEmitter = require('../../utils/EventEmitter');
-
+const regeneratorRuntime = require('../../utils/runtime');
 const DEFAULT_EVENT_TYPE = 'COFFEE_CONFIRMED';
 
 Page({
@@ -16,20 +16,17 @@ Page({
             btnDisabled: true
         }
     },
-    getCoffeeOptions() {
-        return wx.cloud.callFunction({
-            name: 'list-coffee-options'
-        }).then(({result}) => {
-            const {code, errMsg, data} = result;
-            if(code) {
-                return Promise.reject({
-                    title: errMsg,
-                    icon: 'none'
-                });
-            }
-
-            return data;
-        });
+    async getCoffeeOptions() {
+        const db = wx.cloud.database();
+        const collection = db.collection('CoffeeOption');
+        try {
+            return await collection.get();
+        } catch(e) {
+            return {
+                title: errMsg,
+                icon: 'none'
+            };
+        }
     },
 
     bindCoffeeChange(evt) {
@@ -75,7 +72,11 @@ Page({
     },
 
     onReady() {
-        this.getCoffeeOptions().then(list => {
+        this.getCoffeeOptions().then(result => {
+            if(!result.data) {
+                return Promise.reject(result);
+            }
+            const list = result.data;
             // 保存二级选项
             const globalCoffeeOptions = list.map(({ExtendOptions}) => {
                 return ExtendOptions.map(option => {
@@ -98,6 +99,7 @@ Page({
                 }
             });
         }).catch(err => {
+            console.log(err);
             wx.showToast(err);
         });
     }

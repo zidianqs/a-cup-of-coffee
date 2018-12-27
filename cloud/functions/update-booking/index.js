@@ -109,15 +109,13 @@ exports.main = async (event={}, context) => {
                     }
                 }
 
-                binfo.participants.push({
-                    user: OPENID,
-                    choice: choiceInfo,
-                    profile
-                });
-
                 results = await collection.doc(bookingInfo.id).update({
                     data: {
-                        participants: binfo.participants
+                        participants: _.push({
+                            user: OPENID,
+                            choice: choiceInfo,
+                            profile
+                        })
                     }
                 });
                 break;
