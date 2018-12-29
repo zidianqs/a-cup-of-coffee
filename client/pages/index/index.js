@@ -9,7 +9,7 @@ Page({
         hasUserInfo: false,
         profile: null,
         booking: null,
-        loadingStatus: true
+        loading: true
     },
 
     updatePreference(preference) {
@@ -35,7 +35,7 @@ Page({
     onAuthed(authInfo) {
         const {detail} = authInfo;
 
-        if(detail.errMsg) {
+        if(detail.errMsg !== 'getUserInfo:ok') {
             wx.showToast({
                 title: '小样不给授权就不能用！',
                 icon: 'none'
@@ -43,12 +43,11 @@ Page({
             return;
         }
 
-        this.updateProfile(detail).then(this.getMyBooking).catch(this.onError);
+        this.updateProfile(detail.userInfo).then(this.getMyBooking).catch(this.onError);
     },
 
     onCreateBooking() {
         const {profile={}, id} = this.data;
-        console.log(profile);
         if(!profile.preference) {
             this.onChangePreference();
             return;
@@ -136,10 +135,20 @@ Page({
     },
 
     onReady() {
-        checkUserInfo().then(this.updateProfile).then(this.getMyBooking).catch(this.onError);
+        wx.showLoading({
+            title: '正在加载'
+        });
+        checkUserInfo().then(this.updateProfile).then(this.getMyBooking).catch(this.onError).then(this.onComplete);
 
         // 监听选择口味回调
         EventEmitter.addListener(PREFERENCE_EVT, this.updatePreference);
+    },
+
+    onComplete() {
+        this.setData({
+            loading: false
+        });
+        wx.hideLoading();
     },
 
     onError(e) {

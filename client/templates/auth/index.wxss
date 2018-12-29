@@ -1,0 +1,11 @@
+.avatar_auth {
+    width: 150rpx;
+    height: 150rpx;
+    border-radius: 75rpx;
+    overflow: hidden;
+}
+
+.weui-flex__center {
+    flex-direction: column;
+    align-items: center;
+}

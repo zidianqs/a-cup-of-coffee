@@ -1,20 +1,9 @@
-<view class="page">
-    <block wx:if="{{booking}}">
-        <view class="weui-panel weui-panel_access">
-            <view class="weui-panel__hd">{{booking.deadline}}前来一杯</view>
-            <view class="weui-panel__bd">
-                <view class="weui-media-box weui-media-box_appmsg" wx:for="{{booking.participants}}" wx:key="{{user}}">
-                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-                        <image class="weui-media-box__thumb" src="{{item.profile.avatarUrl}}" />
-                    </view>
-                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                        <view class="weui-media-box__title">{{item.profile.nickName}}</view>
-                        <view class="weui-media-box__desc">{{item.choice}}</view>
-                    </view>
-                </view>
-            </view>
-        </view>
-    </block>
+<import src="../../templates/booking/index.wxml" />
+<import src="../../templates/preference/index.wxml" />
+<import src="../../templates/loading/index.wxml" />
+
+<view class="page" wx:if="{{!loading}}" >
+    <template wx:if="{{booking}}" is="booking" data="{{booking, hasDetail: false}}"/>
 
     <view class="weui-footer weui-footer_fixed-bottom">
         <block wx:if="{{booking && booking.status === 'created'}}">
@@ -22,14 +11,7 @@
                 <button class="weui-btn" open-type="getUserInfo" type="primary" bindgetuserinfo="onAuthed">来一杯先</button>
             </block>
             <block wx:elif="{{!isMine}}">
-                <view class="weui-cells weui-cells_after-title">
-                    <view class="weui-cell weui-cell_access">
-                        <view class="weui-cell__bd"><text>{{profile.preference || '暂无口味'}}</text></view>
-                        <view class="weui-cell__ft weui-cell__ft_in-access" style="font-size: 0">
-                            <view style="display: inline-block;vertical-align:middle; font-size: 17px;" bindtap="onChangePreference">换换口味</view>
-                        </view>
-                    </view>
-                </view>
+                <template is="preference" data="{{preference: profile.preference}}" />
                 <button class="weui-btn" type="primary" bindtap="onJoinBooking">算我一个</button>
             </block>
             <block wx:else>
@@ -41,3 +23,5 @@
         </block>
     </view>
 </view>
+
+<template is="loading" wx:if="{{loading}}" />

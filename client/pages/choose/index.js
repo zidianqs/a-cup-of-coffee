@@ -57,11 +57,17 @@ Page({
     bindSelectDone() {
         const data = this.data;
         const event = data.param && data.param.eventType || DEFAULT_EVENT_TYPE;
+        const selectedCoffee = data.rawOptions[data.coffeeIndex];
         const baseType = data.coffeeOptions[data.coffeeIndex];
         const extendType = data.subOptions.map(option => option.list[option.selected]).join(',');
 
-        console.log(`${baseType} ${extendType}`);
-        EventEmitter.dispatch(event, `${baseType} ${extendType}`);
+        EventEmitter.dispatch(event, {
+            baseType,
+            extendType,
+            id: selectedCoffee._id,
+            priceType: selectedCoffee.PriceType,
+            raw: `${baseType} ${extendType}`
+        });
         wx.navigateBack();
     },
 
@@ -89,6 +95,7 @@ Page({
             });
 
             this.setData({
+                rawOptions: list,
                 coffeeOptions: list.map(coffee => coffee.BaseType),
                 globalCoffeeOptions: globalCoffeeOptions,
                 subOptions: globalCoffeeOptions[0] || [],

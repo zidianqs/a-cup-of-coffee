@@ -3,7 +3,7 @@
     "pages/index/index",
     "pages/choose/index",
     "pages/booking/index",
-    "pages/my/index"
+    "pages/debug/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

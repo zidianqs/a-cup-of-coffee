@@ -1,0 +1,10 @@
+<template name="preference">
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_access">
+            <view class="weui-cell__bd"><text>{{preference.raw || '暂无口味'}}</text></view>
+            <view class="weui-cell__ft weui-cell__ft_in-access" style="font-size: 0">
+                <view style="display: inline-block;vertical-align:middle; font-size: 17px;" bindtap="onChangePreference">换换口味</view>
+            </view>
+        </view>
+    </view>
+</template>

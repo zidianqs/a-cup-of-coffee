@@ -10,7 +10,7 @@ exports.main = async (event={}, context) => {
         env: 'prod-1-5d009e'
     });
 
-    const {OPENID} = cloud.getWXContext();
+    const {OPENID, UNIONID, appid} = cloud.getWXContext();
     // 数据库引用
     const db = cloud.database();
 

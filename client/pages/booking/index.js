@@ -11,7 +11,7 @@ Page({
         hasUserInfo: false,
         profile: null,
         isMine: false,
-        loadingStatus: true
+        loading: true
     },
 
     getBookingDetail(_id) {
@@ -124,7 +124,8 @@ Page({
         return this.getBookingDetail(this.data.id).then(booking => {
             this.setData({
                 booking,
-                isMine: this.data.profile.openId === booking.owner
+                isMine: this.data.profile.openId === booking.owner,
+                loading: false
             });
         });
     },
@@ -150,7 +151,7 @@ Page({
     onAuthed(authInfo) {
         const {detail} = authInfo;
 
-        if(detail.errMsg) {
+        if(detail.errMsg !== 'getUserInfo:ok') {
             wx.showToast({
                 title: '小样不给授权就不能用！',
                 icon: 'none'
@@ -158,7 +159,7 @@ Page({
             return;
         }
 
-        this.updateProfile(detail).then(this.updateBookingDetail).catch(this.onError);
+        this.updateProfile(detail.userInfo).then(this.updateBookingDetail).catch(this.onError);
     },
 
     onError(e) {
@@ -166,6 +167,12 @@ Page({
             title: '获取用户信息失败'
         });
         console.log(e);
+    },
+
+    onComplete() {
+        this.setData({
+            loading: false
+        });
     },
 
     onShareAppMessage() {
@@ -192,7 +199,7 @@ Page({
 
         this.setData({id});
 
-        checkUserInfo().then(this.updateProfile).then(this.updateBookingDetail).catch(this.onError);
+        checkUserInfo().then(this.updateProfile).then(this.updateBookingDetail).catch(this.onError).then(this.onComplete);
 
         // 监听选择口味回调
         EventEmitter.addListener(PREFERENCE_EVT, this.updatePreference);

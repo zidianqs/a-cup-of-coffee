@@ -1,0 +1,6 @@
+<template name="auth">
+    <view class="weui-flex weui-flex__center">
+        <open-data class="avatar_auth" type="userAvatarUrl"></open-data>
+    </view>
+    <button class="weui-btn" open-type="getUserInfo" type="primary" bindgetuserinfo="onAuthed">授权</button>
+</template>

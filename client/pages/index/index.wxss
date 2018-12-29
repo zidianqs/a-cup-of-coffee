@@ -1,3 +1,4 @@
+@import "../../templates/auth/index.wxss";
 /**index.wxss**/
 
 .idcard {
