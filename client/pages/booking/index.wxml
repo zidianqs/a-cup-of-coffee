@@ -1,27 +1,32 @@
 <import src="../../templates/booking/index.wxml" />
 <import src="../../templates/preference/index.wxml" />
+<import src="../../templates/auth/index.wxml" />
 <import src="../../templates/loading/index.wxml" />
 
 <view class="page" wx:if="{{!loading}}" >
-    <template wx:if="{{booking}}" is="booking" data="{{booking, hasDetail: false}}"/>
+    <template wx:if="{{booking}}" is="booking" data="{{booking, hasDetail: false}}" />
 
-    <view class="weui-footer weui-footer_fixed-bottom">
-        <block wx:if="{{booking && booking.status === 'created'}}">
-            <block wx:if="{{!hasUserInfo}}">
-                <button class="weui-btn" open-type="getUserInfo" type="primary" bindgetuserinfo="onAuthed">来一杯先</button>
-            </block>
-            <block wx:elif="{{!isMine}}">
-                <template is="preference" data="{{preference: profile.preference}}" />
-                <button class="weui-btn" type="primary" bindtap="onJoinBooking">算我一个</button>
+    <block wx:if="{{hasUserInfo}}">
+        <view class="weui-footer weui-footer_fixed-bottom">
+            <block wx:if="{{booking && booking.status === 'created'}}">
+                <block wx:if="{{!isMine}}">
+                    <template is="preference" data="{{preference: profile.preference}}" />
+
+                    <button wx:if="{{!isMeIn}}" class="weui-btn" type="primary" bindtap="onJoinBooking">算我一个</button>
+                    <button wx:else class="weui-btn" type="primary" bindtap="onLeaveBooking">我不要了</button>
+                </block>
+                <block wx:else>
+                    <button class="weui-btn" type="primary" bindtap="onEndBooking">收工了</button>
+                </block>
             </block>
             <block wx:else>
-                <button class="weui-btn" type="primary" bindtap="onEndBooking">收工了</button>
+                <button class="weui-btn" type="default" disabled="true" plain="true">已经结束了</button>
             </block>
-        </block>
-        <block wx:else>
-            <button class="weui-btn" type="default" disabled="true" plain="true">已经结束了</button>
-        </block>
-    </view>
+        </view>
+    </block>
+    <block wx:else>
+        <template is="auth" />
+    </block>
 </view>
 
 <template is="loading" wx:if="{{loading}}" />
